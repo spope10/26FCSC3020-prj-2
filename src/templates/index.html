@@ -1,0 +1,15 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome to the CTF Platform</h2>
+
+<p>Create and participate in Capture the Flag competitions.</p>
+
+{% if current_user.is_authenticated %}
+    <p>Your role: {{ current_user.role }}</p>
+{% else %}
+    <p>Please register or log in to get started.</p>
+{% endif %}
+
+{% endblock %}

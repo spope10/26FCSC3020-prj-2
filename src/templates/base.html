@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CTF Competition</title>
+</head>
+<body>
+    <h1>CTF Competition Platform</h1>
+
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+
+        {% if current_user.is_authenticated %}
+            <p>Welcome, {{ current_user.name }}!</p>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </nav>
+
+    <hr>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

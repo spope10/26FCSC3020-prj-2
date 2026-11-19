@@ -1,12 +1,54 @@
-@startuml class
+
+@startuml
 
 class User {
-    email
-    name
-    creation_date
-    role
-    password
-    active
+    id: Integer
+    name: String
+    email: String
+    password_hash: String
+    role: String
+    set_password(password)
+    check_password(password)
 }
+
+class Competition {
+    id: Integer
+    name: String
+    description: String
+    start_date: DateTime
+    end_date: DateTime
+    organizer_id: Integer
+}
+
+class Challenge {
+    id: Integer
+    title: String
+    description: String
+    category: String
+    points: Integer
+    flag: String
+    competition_id: Integer
+}
+
+class Registration {
+    id: Integer
+    user_id: Integer
+    competition_id: Integer
+}
+
+class Submission {
+    id: Integer
+    user_id: Integer
+    challenge_id: Integer
+    answer: String
+    is_correct: Boolean
+}
+
+User "1" -- "0..*" Competition : organizes
+User "1" -- "0..*" Registration : registers
+Competition "1" -- "0..*" Registration : includes
+Competition "1" -- "0..*" Challenge : contains
+User "1" -- "0..*" Submission : submits
+Challenge "1" -- "0..*" Submission : receives
 
 @enduml

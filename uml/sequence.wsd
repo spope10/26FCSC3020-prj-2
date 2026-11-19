@@ -1,0 +1,34 @@
+
+@startuml
+title User Registration - Sequence Diagram
+
+actor User
+participant "Registration Page" as Page
+participant "Flask Application" as Flask
+participant "Registration Form" as Form
+database "Database" as DB
+
+User -> Page: Open registration page
+Page -> Flask: GET /register
+Flask -> Page: Display registration form
+
+User -> Page: Enter information and submit
+Page -> Flask: POST /register
+Flask -> Form: Validate form
+
+alt Valid information
+    Form --> Flask: Valid
+    Flask -> DB: Check if email exists
+    DB --> Flask: Email not found
+    Flask -> Flask: Hash password
+    Flask -> DB: Save new user
+    DB --> Flask: User saved
+    Flask -> Page: Redirect to login
+    Page --> User: Registration successful
+else Invalid information
+    Form --> Flask: Validation failed
+    Flask -> Page: Display form errors
+    Page --> User: Correct information
+end
+
+@enduml

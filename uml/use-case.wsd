@@ -1,13 +1,33 @@
-@startuml usecase
 
+@startuml
 left to right direction
 
-:User:
-:Organizer:
-:Participant:
-User <|-- Organizer
-User <|-- Participant 
+actor Participant
+actor Organizer
 
-package "CTF" {
-    :User: --> (registers)
+rectangle "CTF Competition Platform" {
+
+    usecase "Register Account" as UC1
+    usecase "Login" as UC2
+    usecase "View Competitions" as UC3
+    usecase "Create Competition" as UC4
+    usecase "Add Challenges" as UC5
+    usecase "Join Competition" as UC6
+    usecase "Submit Flag" as UC7
+    usecase "View Final Results" as UC8
+}
+
+Participant --> UC1
+Participant --> UC2
+Participant --> UC6
+Participant --> UC7
+Participant --> UC8
+
+Organizer --> UC1
+Organizer --> UC2
+Organizer --> UC3
+Organizer --> UC4
+Organizer --> UC5
+Organizer --> UC8
+
 @enduml
