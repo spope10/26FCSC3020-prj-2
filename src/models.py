@@ -1,4 +1,6 @@
 
+
+
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, login_manager
@@ -41,4 +43,26 @@ class Competition(db.Model):
     organizer = db.relationship(
         "User",
         backref="competitions"
+    )
+
+
+class Challenge(db.Model):
+    __tablename__ = "challenges"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    points = db.Column(db.Integer, nullable=False)
+    flag = db.Column(db.String(255), nullable=False)
+
+    competition_id = db.Column(
+        db.Integer,
+        db.ForeignKey("competitions.id"),
+        nullable=False
+    )
+
+    competition = db.relationship(
+        "Competition",
+        backref="challenges"
     )

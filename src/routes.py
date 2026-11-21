@@ -1,5 +1,6 @@
 
 
+
 from flask import render_template, redirect, url_for, flash, abort
 from flask_login import (
     login_user,
@@ -9,8 +10,13 @@ from flask_login import (
 )
 
 from . import db
-from .models import User, Competition
-from .forms import RegistrationForm, LoginForm, CompetitionForm
+from .models import User, Competition, Challenge
+from .forms import (
+    RegistrationForm,
+    LoginForm,
+    CompetitionForm,
+    ChallengeForm
+)
 
 
 def register_routes(app):
@@ -104,4 +110,47 @@ def register_routes(app):
         return render_template(
             "create_competition.html",
             form=form
+        )
+
+    # US4: Organizer adds challenges to their competition
+    @app.route(
+        "/competitions/<int:competition_id>/challenges/create",
+        methods=["GET", "POST"]
+    )
+    @login_required
+    def create_challenge(competition_id):
+        if current_user.role != "organizer":
+            abort(403)
+
+        competition = db.get_or_404(
+            Competition,
+            competition_id
+        )
+
+        # Only the competition owner can add challenges.
+        if competition.organizer_id != current_user.id:
+            abort(403)
+
+        form = ChallengeForm()
+
+        if form.validate_on_submit():
+            challenge = Challenge(
+                title=form.title.data.strip(),
+                description=form.description.data.strip(),
+                category=form.category.data,
+                points=form.points.data,
+                flag=form.flag.data.strip(),
+                competition_id=competition.id
+            )
+
+            db.session.add(challenge)
+            db.session.commit()
+
+            flash("Challenge added successfully!")
+            return redirect(url_for("competitions"))
+
+        return render_template(
+            "create_challenge.html",
+            form=form,
+            competition=competition
         )

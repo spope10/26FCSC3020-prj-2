@@ -1,0 +1,62 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Add Challenge</h2>
+
+<p>Competition: {{ competition.name }}</p>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title() }}
+        {% for error in form.title.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.description.label }}<br>
+        {{ form.description() }}
+        {% for error in form.description.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.category.label }}<br>
+        {{ form.category() }}
+        {% for error in form.category.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.points.label }}<br>
+        {{ form.points() }}
+        {% for error in form.points.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.flag.label }}<br>
+        {{ form.flag() }}
+        {% for error in form.flag.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>{{ form.submit() }}</p>
+</form>
+
+<p>
+    <a href="{{ url_for('competitions') }}">
+        Back to My Competitions
+    </a>
+</p>
+
+{% endblock %}

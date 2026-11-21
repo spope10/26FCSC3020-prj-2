@@ -1,4 +1,5 @@
 
+
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField,
@@ -6,14 +7,16 @@ from wtforms import (
     SelectField,
     SubmitField,
     TextAreaField,
-    DateTimeLocalField
+    DateTimeLocalField,
+    IntegerField
 )
 from wtforms.validators import (
     DataRequired,
     Email,
     Length,
     EqualTo,
-    ValidationError
+    ValidationError,
+    NumberRange
 )
 
 from .models import User
@@ -114,3 +117,51 @@ class CompetitionForm(FlaskForm):
                 raise ValidationError(
                     "End date must be after start date."
                 )
+
+
+class ChallengeForm(FlaskForm):
+    title = StringField(
+        "Challenge Title",
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+
+    description = TextAreaField(
+        "Description",
+        validators=[DataRequired()]
+    )
+
+    category = SelectField(
+        "Category",
+        choices=[
+            ("Python", "Python"),
+            ("Web Security", "Web Security"),
+            ("Cryptography", "Cryptography"),
+            ("Forensics", "Forensics"),
+            ("General", "General")
+        ],
+        validators=[DataRequired()]
+    )
+
+    points = IntegerField(
+        "Points",
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=1,
+                message="Points must be greater than zero."
+            )
+        ]
+    )
+
+    flag = StringField(
+        "Correct Flag",
+        validators=[
+            DataRequired(),
+            Length(max=255)
+        ]
+    )
+
+    submit = SubmitField("Add Challenge")
