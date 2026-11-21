@@ -1,5 +1,6 @@
 
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from flask import render_template, redirect, url_for, flash, abort
 from flask_login import (
@@ -10,7 +11,7 @@ from flask_login import (
 )
 
 from . import db
-from .models import User, Competition, Challenge
+from .models import User, Competition, Challenge, Registration
 from .forms import (
     RegistrationForm,
     LoginForm,
@@ -25,6 +26,7 @@ def register_routes(app):
     def index():
         return render_template("index.html")
 
+    # US1: User registration
     @app.route("/register", methods=["GET", "POST"])
     def register():
         form = RegistrationForm()
@@ -45,6 +47,7 @@ def register_routes(app):
 
         return render_template("register.html", form=form)
 
+    # User login
     @app.route("/login", methods=["GET", "POST"])
     def login():
         form = LoginForm()
@@ -61,6 +64,7 @@ def register_routes(app):
 
         return render_template("login.html", form=form)
 
+    # User logout
     @app.route("/logout")
     @login_required
     def logout():
@@ -154,3 +158,76 @@ def register_routes(app):
             form=form,
             competition=competition
         )
+
+    # US5: Participant views available competitions
+    @app.route("/competitions/available")
+    @login_required
+    def available_competitions():
+        if current_user.role != "participant":
+            abort(403)
+
+        # Competition dates are interpreted in Denver time.
+        now = datetime.now(
+            ZoneInfo("America/Denver")
+        ).replace(tzinfo=None)
+
+        available = Competition.query.filter(
+            Competition.start_date > now
+        ).order_by(Competition.start_date).all()
+
+        registered_ids = {
+            registration.competition_id
+            for registration in Registration.query.filter_by(
+                user_id=current_user.id
+            ).all()
+        }
+
+        return render_template(
+            "available_competitions.html",
+            competitions=available,
+            registered_ids=registered_ids
+        )
+
+    # US5: Participant joins a competition
+    @app.route(
+        "/competitions/<int:competition_id>/join",
+        methods=["POST"]
+    )
+    @login_required
+    def join_competition(competition_id):
+        if current_user.role != "participant":
+            abort(403)
+
+        competition = db.get_or_404(
+            Competition,
+            competition_id
+        )
+
+        # Compare dates using Denver local time.
+        now = datetime.now(
+            ZoneInfo("America/Denver")
+        ).replace(tzinfo=None)
+
+        if now >= competition.start_date:
+            flash("Registration is closed for this competition.")
+            return redirect(url_for("available_competitions"))
+
+        existing = Registration.query.filter_by(
+            user_id=current_user.id,
+            competition_id=competition.id
+        ).first()
+
+        if existing:
+            flash("You are already registered for this competition.")
+            return redirect(url_for("available_competitions"))
+
+        registration = Registration(
+            user_id=current_user.id,
+            competition_id=competition.id
+        )
+
+        db.session.add(registration)
+        db.session.commit()
+
+        flash("You have successfully joined the competition!")
+        return redirect(url_for("available_competitions"))

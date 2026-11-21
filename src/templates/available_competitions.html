@@ -1,0 +1,61 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Available Competitions</h2>
+
+<p>Register for an upcoming CTF competition.</p>
+
+{% if competitions %}
+
+    {% for competition in competitions %}
+
+        <div>
+            <h3>{{ competition.name }}</h3>
+
+            <p>{{ competition.description }}</p>
+
+            <p>
+                <strong>Starts:</strong>
+                {{ competition.start_date.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+
+            <p>
+                <strong>Ends:</strong>
+                {{ competition.end_date.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+
+            {% if competition.id in registered_ids %}
+
+                <p>You are already registered.</p>
+
+            {% else %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('join_competition', competition_id=competition.id) }}"
+                >
+                    <input type="hidden"
+                           name="csrf_token"
+                           value="{{ csrf_token() }}">
+
+                    <button type="submit">
+                        Join Competition
+                    </button>
+                </form>
+
+            {% endif %}
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No upcoming competitions are available.</p>
+
+{% endif %}
+
+{% endblock %}

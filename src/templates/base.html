@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,13 +14,26 @@
         <a href="{{ url_for('index') }}">Home</a>
 
         {% if current_user.is_authenticated %}
+
             {% if current_user.role == 'organizer' %}
-                <a href="{{ url_for('competitions') }}">My Competitions</a>
-                <a href="{{ url_for('create_competition') }}">Create Competition</a>
+                <a href="{{ url_for('competitions') }}">
+                    My Competitions
+                </a>
+
+                <a href="{{ url_for('create_competition') }}">
+                    Create Competition
+                </a>
+
+            {% elif current_user.role == 'participant' %}
+                <a href="{{ url_for('available_competitions') }}">
+                    Available Competitions
+                </a>
             {% endif %}
 
             <p>Welcome, {{ current_user.name }}!</p>
+
             <a href="{{ url_for('logout') }}">Logout</a>
+
         {% else %}
             <a href="{{ url_for('register') }}">Register</a>
             <a href="{{ url_for('login') }}">Login</a>
