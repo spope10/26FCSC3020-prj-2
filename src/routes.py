@@ -1,9 +1,16 @@
 
-from flask import render_template, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required
+
+from flask import render_template, redirect, url_for, flash, abort
+from flask_login import (
+    login_user,
+    logout_user,
+    login_required,
+    current_user
+)
+
 from . import db
-from .models import User
-from .forms import RegistrationForm, LoginForm
+from .models import User, Competition
+from .forms import RegistrationForm, LoginForm, CompetitionForm
 
 
 def register_routes(app):
@@ -53,3 +60,48 @@ def register_routes(app):
     def logout():
         logout_user()
         return redirect(url_for("index"))
+
+    # US2: Organizer views their competitions
+    @app.route("/competitions")
+    @login_required
+    def competitions():
+        if current_user.role != "organizer":
+            abort(403)
+
+        my_competitions = Competition.query.filter_by(
+            organizer_id=current_user.id
+        ).order_by(Competition.start_date).all()
+
+        return render_template(
+            "competitions.html",
+            competitions=my_competitions
+        )
+
+    # US3: Organizer creates a competition
+    @app.route("/competitions/create", methods=["GET", "POST"])
+    @login_required
+    def create_competition():
+        if current_user.role != "organizer":
+            abort(403)
+
+        form = CompetitionForm()
+
+        if form.validate_on_submit():
+            competition = Competition(
+                name=form.name.data.strip(),
+                description=form.description.data.strip(),
+                start_date=form.start_date.data,
+                end_date=form.end_date.data,
+                organizer_id=current_user.id
+            )
+
+            db.session.add(competition)
+            db.session.commit()
+
+            flash("Competition created successfully!")
+            return redirect(url_for("competitions"))
+
+        return render_template(
+            "create_competition.html",
+            form=form
+        )

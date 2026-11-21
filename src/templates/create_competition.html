@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Create Competition</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.name.label }}
+        {{ form.name() }}
+        {% for error in form.name.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.description.label }}
+        {{ form.description() }}
+        {% for error in form.description.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.start_date.label }}
+        {{ form.start_date() }}
+        {% for error in form.start_date.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>
+        {{ form.end_date.label }}
+        {{ form.end_date() }}
+        {% for error in form.end_date.errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+    </p>
+
+    <p>{{ form.submit() }}</p>
+</form>
+
+<p>
+    <a href="{{ url_for('competitions') }}">
+        Back to My Competitions
+    </a>
+</p>
+
+{% endblock %}

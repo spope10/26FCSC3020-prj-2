@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>My Competitions</h2>
+
+<p>Competitions you have created.</p>
+
+<a href="{{ url_for('create_competition') }}">
+    Create New Competition
+</a>
+
+{% if competitions %}
+    <ul>
+        {% for competition in competitions %}
+            <li>
+                <h3>{{ competition.name }}</h3>
+
+                <p>{{ competition.description }}</p>
+
+                <p>
+                    Start:
+                    {{ competition.start_date.strftime('%Y-%m-%d %H:%M') }}
+                </p>
+
+                <p>
+                    End:
+                    {{ competition.end_date.strftime('%Y-%m-%d %H:%M') }}
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have not created any competitions yet.</p>
+{% endif %}
+
+{% endblock %}
